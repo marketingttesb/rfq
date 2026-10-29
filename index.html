@@ -165,14 +165,24 @@
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;">
         <div style="display:flex;flex-direction:column;gap:4px;">
-          <img src="transparent_gray.png" alt="Logo" style="height:48px;width:auto;">
+          <img src="transparent_gray.png" alt="Logo" style="height:auto;width:150px;">
           <h1 style="margin:0;">Request for Quotation</h1>
           <p class="subtitle" style="margin:0;">Isi maklumat anda untuk buat permintaan sebut harga.</p>
         </div>
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://marketingttesb.github.io/rfq/" alt="QR Code" style="height:90px;width:90px;">
       </div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
 
       <form id="rfqForm">
+        <div class="field">
+          <label style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Produk (boleh multiple lines)</span>
+            <a href="https://www.tientien.com.my/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-size:12px;font-weight:400;">Tien Tien Website</a>
+          </label>
+          <div id="itemsContainer"></div>
+          <button type="button" id="addItemBtn" class="add-btn">+ Tambah Item</button>
+        </div>
+
         <div class="field" id="f-name">
           <label for="name">Nama Penuh</label>
           <input type="text" id="name" name="name" placeholder="Ahmad bin Ali" required>
@@ -202,15 +212,6 @@
           <label for="address">Alamat</label>
           <textarea id="address" name="address" placeholder="No. 1, Jalan Example, Taman ABC, 50000 Kuala Lumpur" required></textarea>
           <div class="error">Sila masukkan alamat.</div>
-        </div>
-
-        <div class="field">
-          <label style="display:flex;justify-content:space-between;align-items:center;">
-            <span>Produk (boleh multiple lines)</span>
-            <a href="https://www.tientien.com.my/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-size:12px;font-weight:400;">Tien Tien Website</a>
-          </label>
-          <div id="itemsContainer"></div>
-          <button type="button" id="addItemBtn" class="add-btn">+ Tambah Item</button>
         </div>
 
         <div class="field">
