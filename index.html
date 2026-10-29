@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request for Quotation (RFQ)</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #dc2626;
+      --accent-hover: #b91c1c;
+      --border: #d1d5db;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f3f4f6;
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container { width: 100%; max-width: 560px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    h1 { font-size: 24px; margin-bottom: 6px; }
+    .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 24px; text-align: center; }
+    .field { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    input, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+    textarea { resize: vertical; min-height: 90px; }
+    .error { color: var(--danger); font-size: 12px; margin-top: 4px; display: none; }
+    .field.invalid .error { display: block; }
+    .field.invalid input, .field.invalid textarea { border-color: var(--danger); }
+    .add-btn {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: 1px dashed var(--border);
+      color: var(--accent);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s;
+    }
+    .add-btn:hover { border-color: var(--accent); background: rgba(59,130,246,0.08); }
+    .item-row {
+      display: grid;
+      grid-template-columns: 1fr 90px 36px;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .item-row input { padding: 10px 12px; }
+    .remove-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--danger);
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      margin: 0;
+    }
+    .remove-btn:hover { background: rgba(239,68,68,0.1); border-color: var(--danger); }
+    .items-empty { color: var(--muted); font-size: 13px; padding: 8px 0; }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+    button:hover { background: var(--accent-hover); }
+    button:active { transform: scale(0.99); }
+    .success {
+      display: none;
+      text-align: center;
+      padding: 24px 0;
+    }
+    .success.show { display: block; }
+    .success .icon { font-size: 48px; color: var(--success); margin-bottom: 12px; }
+    .success h2 { margin-bottom: 8px; }
+    .success p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    .summary {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: left;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .summary div { margin-bottom: 6px; }
+    .summary span { color: var(--muted); }
+    .reset-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .reset-btn:hover { background: #0f172a; }
+    .history {
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .history h3 { font-size: 14px; color: var(--text); margin-bottom: 8px; }
+    .history ul { list-style: none; padding: 0; }
+    .history li {
+      padding: 8px 10px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .history li span { color: var(--muted); font-size: 12px; }
+    @media (max-width: 480px) {
+      .row { grid-template-columns: 1fr; }
+      .card { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:6px;text-align:center;">
+        <img src="transparent_gray.png" alt="Logo" style="height:48px;width:auto;">
+        <h1 style="margin:0;">Request for Quotation</h1>
+      </div>
+      <p class="subtitle">Isi maklumat anda untuk buat permintaan sebut harga.</p>
+
+      <form id="rfqForm">
+        <div class="field" id="f-name">
+          <label for="name">Nama Penuh</label>
+          <input type="text" id="name" name="name" placeholder="Ahmad bin Ali" required>
+          <div class="error">Sila masukkan nama.</div>
+        </div>
+
+        <div class="field" id="f-email">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="ahmad@example.com" required>
+          <div class="error">Sila masukkan email yang sah.</div>
+        </div>
+
+        <div class="row">
+          <div class="field" id="f-phone">
+            <label for="phone">No. Telefon</label>
+            <input type="tel" id="phone" name="phone" placeholder="012-3456789" required>
+            <div class="error">Sila masukkan no. telefon.</div>
+          </div>
+          <div class="field" id="f-postcode">
+            <label for="postcode">Poskod</label>
+            <input type="text" id="postcode" name="postcode" placeholder="50000" pattern="[0-9]{5}" required>
+            <div class="error">Poskod mestilah 5 digit.</div>
+          </div>
+        </div>
+
+        <div class="field" id="f-address">
+          <label for="address">Alamat</label>
+          <textarea id="address" name="address" placeholder="No. 1, Jalan Example, Taman ABC, 50000 Kuala Lumpur" required></textarea>
+          <div class="error">Sila masukkan alamat.</div>
+        </div>
+
+        <div class="field">
+          <label style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Produk (boleh multiple lines)</span>
+            <a href="https://www.tientien.com.my/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-size:12px;font-weight:400;">Tien Tien Website</a>
+          </label>
+          <div id="itemsContainer"></div>
+          <button type="button" id="addItemBtn" class="add-btn">+ Tambah Item</button>
+        </div>
+
+        <div class="field">
+          <label for="notes">Catatan (pilihan)</label>
+          <textarea id="notes" name="notes" placeholder="Sebarang maklumat tambahan..."></textarea>
+        </div>
+
+        <button type="submit">Hantar RFQ</button>
+      </form>
+
+      <div class="success" id="success">
+        <div class="icon">✓</div>
+        <h2>RFQ Berjaya Dihantar!</h2>
+        <p>Terima kasih. Kami akan hubungi anda segera.</p>
+        <div class="summary" id="summary"></div>
+        <button class="reset-btn" id="resetBtn">Buat RFQ Baru</button>
+      </div>
+
+      <div class="history" id="history"></div>
+    </div>
+  </div>
+
+  <script>
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    const form = document.getElementById('rfqForm');
+    const itemsContainer = document.getElementById('itemsContainer');
+    const addItemBtn = document.getElementById('addItemBtn');
+
+    function addItemRow(name = '', qty = '1') {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML =
+        '<input type="text" class="item-name" placeholder="Nama produk / servis" value="' + escapeHtml(name) + '" required>' +
+        '<input type="number" class="item-qty" min="1" value="' + escapeHtml(qty) + '" placeholder="Qty">' +
+        '<button type="button" class="remove-btn" title="Buang">&times;</button>';
+      row.querySelector('.remove-btn').addEventListener('click', () => row.remove());
+      itemsContainer.appendChild(row);
+    }
+
+    addItemBtn.addEventListener('click', () => addItemRow());
+    // start with one row
+    addItemRow();
+
+    function collectItems() {
+      return Array.from(itemsContainer.querySelectorAll('.item-row'))
+        .map(r => ({
+          name: r.querySelector('.item-name').value.trim(),
+          qty: r.querySelector('.item-qty').value.trim() || '1'
+        }))
+        .filter(i => i.name);
+    }
+    const success = document.getElementById('success');
+    const summary = document.getElementById('summary');
+    const resetBtn = document.getElementById('resetBtn');
+    const historyEl = document.getElementById('history');
+
+    function validateField(id, check) {
+      const field = document.getElementById('f-' + id);
+      const input = document.getElementById(id);
+      const ok = check(input.value.trim());
+      field.classList.toggle('invalid', !ok);
+      return ok;
+    }
+
+    const validators = {
+      name: v => v.length >= 2,
+      email: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+      phone: v => v.replace(/\D/g,'').length >= 9,
+      postcode: v => /^[0-9]{5}$/.test(v),
+      address: v => v.length >= 5,
+    };
+
+    ['name','email','phone','postcode','address'].forEach(id => {
+      const input = document.getElementById(id);
+      input.addEventListener('input', () => validateField(id, validators[id]));
+    });
+
+    function loadHistory() {
+      const items = JSON.parse(localStorage.getItem('rfq_history') || '[]');
+      if (!items.length) { historyEl.innerHTML = ''; return; }
+      historyEl.innerHTML = '<h3>Sejarah RFQ (' + items.length + ')</h3><ul>' +
+        items.slice(-5).reverse().map(i =>
+          '<li><div><strong>' + escapeHtml(i.name) + '</strong><br><span>' + escapeHtml(i.email) + '</span></div><span>' + new Date(i.ts).toLocaleDateString('ms-MY') + '</span></li>'
+        ).join('') + '</ul>';
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      let ok = true;
+      for (const id in validators) {
+        if (!validateField(id, validators[id])) ok = false;
+      }
+      const items = collectItems();
+      if (!items.length) {
+        ok = false;
+        itemsContainer.style.outline = '1px solid var(--danger)';
+        itemsContainer.style.borderRadius = '8px';
+        itemsContainer.style.padding = '4px';
+      } else {
+        itemsContainer.style.outline = '';
+        itemsContainer.style.padding = '';
+      }
+      if (!ok) return;
+      const data = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        postcode: document.getElementById('postcode').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        items: items,
+        notes: document.getElementById('notes').value.trim(),
+        ts: Date.now()
+      };
+
+      const historyItems = JSON.parse(localStorage.getItem('rfq_history') || '[]');
+      historyItems.push(data);
+      localStorage.setItem('rfq_history', JSON.stringify(historyItems));
+
+      const waNumber = '60327702706'; // tukar ke nombor WhatsApp anda (format: 60xxx tanpa +)
+      const waMsg = encodeURIComponent(
+        'RFQ Baru\n' +
+        'Nama: ' + data.name + '\n' +
+        'Email: ' + data.email + '\n' +
+        'Telefon: ' + data.phone + '\n' +
+        'Poskod: ' + (data.postcode || '-') + '\n' +
+        'Alamat: ' + data.address + '\n' +
+        (data.items.length ? 'Item:\n' + data.items.map(i => ' - ' + i.name + ' (Qty: ' + i.qty + ')').join('\n') + '\n' : '') +
+        (data.notes ? 'Catatan: ' + data.notes : '')
+      );
+      const waUrl = 'https://wa.me/' + waNumber + '?text=' + waMsg;
+
+      summary.innerHTML =
+        '<div><span>Nama:</span> ' + escapeHtml(data.name) + '</div>' +
+        '<div><span>Email:</span> ' + escapeHtml(data.email) + '</div>' +
+        '<div><span>Telefon:</span> ' + escapeHtml(data.phone) + '</div>' +
+        '<div><span>Poskod:</span> ' + (data.postcode || '-') + '</div>' +
+        '<div><span>Alamat:</span> ' + escapeHtml(data.address) + '</div>' +
+        (data.items.length ? '<div><span>Item:</span><ul style="margin:6px 0 0 16px;padding:0;">' + data.items.map(i => '<li>' + escapeHtml(i.name) + ' (Qty: ' + escapeHtml(i.qty) + ')</li>').join('') + '</ul></div>' : '') +
+        (data.notes ? '<div><span>Catatan:</span> ' + escapeHtml(data.notes) + '</div>' : '') +
+        '<button type="button" onclick="window.open(\'' + waUrl.replace(/'/g, '%27') + '\',\'_blank\')" style="display:block;width:100%;margin-top:14px;padding:12px;background:#25D366;color:#fff;text-align:center;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">📱 Hantar ke WhatsApp</button>';
+
+      form.style.display = 'none';
+      success.classList.add('show');
+      loadHistory();
+      // auto-open WhatsApp
+      window.open(waUrl, '_blank');
+    });
+
+    resetBtn.addEventListener('click', () => {
+      form.reset();
+      itemsContainer.innerHTML = '';
+      addItemRow();
+      form.style.display = 'block';
+      success.classList.remove('show');
+      document.querySelectorAll('.field').forEach(f => f.classList.remove('invalid'));
+    });
+
+    loadHistory();
+  </script>
+</body>
+</html>
