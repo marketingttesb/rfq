@@ -163,14 +163,14 @@
 <body>
   <div class="container">
     <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;text-align:left;">
-        <div style="display:flex;align-items:center;gap:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;">
+        <div style="display:flex;flex-direction:column;gap:4px;">
           <img src="transparent_gray.png" alt="Logo" style="height:48px;width:auto;">
           <h1 style="margin:0;">Request for Quotation</h1>
+          <p class="subtitle" style="margin:0;">Isi maklumat anda untuk buat permintaan sebut harga.</p>
         </div>
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://marketingttesb.github.io/rfq/" alt="QR Code" style="height:90px;width:90px;">
       </div>
-      <p class="subtitle">Isi maklumat anda untuk buat permintaan sebut harga.</p>
 
       <form id="rfqForm">
         <div class="field" id="f-name">
