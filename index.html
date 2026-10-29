@@ -175,6 +175,19 @@
 
       <form id="rfqForm">
         <div class="field">
+          <label for="agent">Pilih Ejen</label>
+          <select id="agent" required style="width:100%;padding:12px 14px;background:#ffffff;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;">
+            <option value="">-- Pilih Ejen --</option>
+            <option value="601126546006">Aini</option>
+            <option value="60165406008">Anis</option>
+            <option value="60109576008">Izni</option>
+            <option value="60199865555">Melissa</option>
+            <option value="60199982335">Siti</option>
+          </select>
+          <div class="error">Sila pilih ejen.</div>
+        </div>
+
+        <div class="field">
           <label style="display:flex;justify-content:space-between;align-items:center;">
             <span>Produk (boleh multiple lines)</span>
             <a href="https://www.tientien.com.my/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-size:12px;font-weight:400;">Tien Tien Website</a>
@@ -316,7 +329,12 @@
         itemsContainer.style.padding = '';
       }
       if (!ok) return;
+      const agentSelect = document.getElementById('agent');
+      const waNumber = agentSelect.value;
+      const agentName = agentSelect.options[agentSelect.selectedIndex].text;
+
       const data = {
+        agent: agentName,
         name: document.getElementById('name').value.trim(),
         email: document.getElementById('email').value.trim(),
         phone: document.getElementById('phone').value.trim(),
@@ -331,9 +349,9 @@
       historyItems.push(data);
       localStorage.setItem('rfq_history', JSON.stringify(historyItems));
 
-      const waNumber = '60327702706'; // tukar ke nombor WhatsApp anda (format: 60xxx tanpa +)
       const waMsg = encodeURIComponent(
         'RFQ Baru\n' +
+        'Ejen: ' + data.agent + '\n' +
         'Nama: ' + data.name + '\n' +
         'Email: ' + data.email + '\n' +
         'Telefon: ' + data.phone + '\n' +
@@ -345,6 +363,7 @@
       const waUrl = 'https://wa.me/' + waNumber + '?text=' + waMsg;
 
       summary.innerHTML =
+        '<div><span>Ejen:</span> ' + escapeHtml(data.agent) + '</div>' +
         '<div><span>Nama:</span> ' + escapeHtml(data.name) + '</div>' +
         '<div><span>Email:</span> ' + escapeHtml(data.email) + '</div>' +
         '<div><span>Telefon:</span> ' + escapeHtml(data.phone) + '</div>' +
