@@ -167,15 +167,15 @@
         <div style="display:flex;flex-direction:column;gap:4px;">
           <img src="transparent_gray.png" alt="Logo" style="height:auto;width:150px;">
           <h1 style="margin:0;">Request for Quotation</h1>
-          <p class="subtitle" style="margin:0;">Isi maklumat anda untuk buat permintaan sebut harga.</p>
+          <p class="subtitle" style="margin:0;">Isi maklumat anda untuk proses seterusnya.</p>
         </div>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://marketingttesb.github.io/rfq/" alt="QR Code" style="height:90px;width:90px;">
+        <img src="qr.png" alt="QR Code" style="height:150px;width:150px;">
       </div>
       <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
 
       <form id="rfqForm">
-        <div class="field">
-          <label for="agent">Pilih Ejen</label>
+        <div class="field" id="f-agent">
+          <label for="agent">Ejen</label>
           <select id="agent" required style="width:100%;padding:12px 14px;background:#ffffff;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;">
             <option value="">-- Pilih Ejen --</option>
             <option value="601126546006">Aini</option>
@@ -254,6 +254,62 @@
     const itemsContainer = document.getElementById('itemsContainer');
     const addItemBtn = document.getElementById('addItemBtn');
 
+    // Agent config: slug -> {name, phone}
+    const agents = {
+      aini: { name: 'Aini', phone: '601126546006' },
+      anis: { name: 'Anis', phone: '60165406008' },
+      izni: { name: 'Izni', phone: '60109576008' },
+      melissa: { name: 'Melissa', phone: '60199865555' },
+      siti: { name: 'Siti', phone: '60199982335' },
+    };
+
+    const agentField = document.getElementById('f-agent');
+    const agentSelect = document.getElementById('agent');
+
+    // Lock agent if provided via URL ?agent=slug
+    const params = new URLSearchParams(window.location.search);
+    let agentSlug = '';
+    const rawAgent = params.get('agent') || '';
+    try {
+      agentSlug = atob(rawAgent).toLowerCase();
+    } catch (e) {
+      agentSlug = rawAgent.toLowerCase();
+    }
+    let lockedAgent = null;
+    if (agents[agentSlug]) {
+      lockedAgent = agentSlug;
+      // select matching option by phone
+      for (const opt of agentSelect.options) {
+        if (opt.value === agents[agentSlug].phone) { opt.selected = true; break; }
+      }
+      agentSelect.disabled = true;
+      // hide dropdown, show locked label
+      agentSelect.style.display = 'none';
+      const lockedLabel = document.createElement('div');
+      lockedLabel.style.cssText = 'padding:12px 14px;background:#f3f4f6;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;';
+      lockedLabel.textContent = 'Ejen: ' + agents[agentSlug].name;
+      agentField.appendChild(lockedLabel);
+      // hide the "Pilih Ejen" label text? keep
+    } else {
+      // No agent in URL: hide dropdown, disable submit
+      agentField.style.display = 'none';
+      const notice = document.createElement('div');
+      notice.style.cssText = 'padding:12px 14px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;color:#991b1b;font-size:14px;margin-bottom:12px;';
+      notice.textContent = 'Sila akses borang melalui link/QR yang diberi oleh ejen anda.';
+      agentField.parentNode.insertBefore(notice, agentField);
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+    }
+
+    function getSelectedAgent() {
+      if (lockedAgent) return agents[lockedAgent];
+      const phone = agentSelect.value;
+      for (const a of Object.values(agents)) {
+        if (a.phone === phone) return a;
+      }
+      return null;
+    }
+
     function addItemRow(name = '', qty = '1') {
       const row = document.createElement('div');
       row.className = 'item-row';
@@ -329,9 +385,9 @@
         itemsContainer.style.padding = '';
       }
       if (!ok) return;
-      const agentSelect = document.getElementById('agent');
-      const waNumber = agentSelect.value;
-      const agentName = agentSelect.options[agentSelect.selectedIndex].text;
+      const agent = getSelectedAgent();
+      const waNumber = agent ? agent.phone : '';
+      const agentName = agent ? agent.name : '';
 
       const data = {
         agent: agentName,
